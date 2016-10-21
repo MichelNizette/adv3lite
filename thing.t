@@ -7874,7 +7874,7 @@ class Thing:  ReplaceRedirector, Mentionable
         
         report()
         {
-            DMsg(jump off, '{I} jump{s/ed} off {1} and land{s/ed} on the ground', 
+            DMsg(jump off, '{I} jump{s/ed} off {1} and land{s/ed} on the ground. ', 
                  gActionListStr);
         }
     }
