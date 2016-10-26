@@ -1276,9 +1276,9 @@ class TravelAction: Action
         local conn;
         
         /* 
-         *   Note whether the current location is located, or whether it permits
-         *   travel in the dark (in which case we treat it as illuminated for
-         *   the purposes of allowing travel).
+         *   Note whether the current location is illuminated, or whether it
+         *   permits travel in the dark (in which case we treat it as
+         *   illuminated for the purposes of allowing travel).
          */
         local illum = loc.allowDarkTravel || loc.isIlluminated;
         
