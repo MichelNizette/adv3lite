@@ -8387,8 +8387,8 @@ class Thing:  ReplaceRedirector, Mentionable
     /* Check the travel barriers on the indirect object of the action */
     checkPushTravel()
     {
-        checkTravel(gDobj);
-        checkTravel(gActor);
+        if (!checkTravel(gDobj)) return;
+        if (!checkTravel(gActor)) return;
     }
     
     /*  Carry out the push travel on the direct object of the action. */
