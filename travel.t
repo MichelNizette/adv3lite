@@ -749,21 +749,20 @@ class Door: TravelConnector, Thing
         {
             /* 
              *   If it's the player character that's trying to move, try opening
-             *   the door via an implicit action and display the result as an
-             *   implicit action report.
+             *   the door via an implicit action.
              */
             if(gPlayerChar.isOrIsIn(traveler))
-            {
-                if(tryImplicitAction(Open, self))
-                    "<<gAction.buildImplicitActionAnnouncement(true)>>";
-            }
+                tryImplicitAction(Open, self);
             
             /*   
              *   Otherwise get the traveler to try to open the door via an
              *   implicit action.
              */
             else if(tryImplicitActorAction(traveler, Open, self))
-            {                   
+            {      
+            	// MN-TODO: those messages shouldn't be output in the check
+            	//          phase. 
+                         
                 /* 
                  *   If the player character can see the traveler open the door,
                  *   report the fact that the traveler does so.
@@ -1058,21 +1057,45 @@ class TravelConnector: object
      */    
     travelVia(actor)
     {
-        /* 
-         *   The traveler is the object actually doing the travelling; usually
-         *   it's just the actor, but if the actor is in a vehicle, it will be
-         *   the vehicle.
-         */
-        local traveler = getTraveler(actor);       
-        
-        /* 
-         *   Check the travel barriers on this TravelConnector to ensure that
-         *   travel is permitted. If so carry out the travel. If not
-         *   checkTravelBarriers will have reported the reason why travel is
-         *   blocked.
-         */
-        if(checkTravelBarriers(traveler))           
-            execTravel(actor, traveler, self);               
+    	/*
+    	 *   Synthesize and execute a nested TransportVia action, with the
+    	 *   actor doing the travel as the direct object and this connector
+    	 *   as the indirect object.
+    	 */
+        nestedAction(TransportVia, actor, self);           
+    }
+    
+    iobjFor(TransportVia)
+    {
+    	check()
+    	{
+	        /* 
+	         *   The traveler is the object actually doing the travelling;
+	         *   usually it's just the direct object, but if the direct object
+	         *   is in a vehicle, it will be the vehicle.
+	         */
+	        local traveler = getTraveler(gDobj);       
+	        
+	        /* 
+	         *   Check the travel barriers on this TravelConnector to ensure
+	         *   that travel is permitted. If not, checkTravel will report the
+	         *   reason why travel is blocked.
+	         */
+	        checkTravel(traveler);
+    	}
+    	
+    	action()
+    	{
+	        /* 
+	         *   The traveler is the object actually doing the travelling;
+	         *   usually it's just the direct object, but if the direct object
+	         *   is in a vehicle, it will be the vehicle.
+	         */
+	        local traveler = getTraveler(gDobj);       
+	        
+	        /* Carry out the travel. */
+	        execTravel(gDobj, traveler, self);
+    	}
     }
     
    
@@ -1099,6 +1122,16 @@ class TravelConnector: object
         return actor;
     }
     
+    /*
+     *   Check that travel is possible for this actor via this connector,
+     *   and attempt to carry out any implicit actions necessary to make travel
+     *   possible.
+     */
+    checkTravel(traveler)
+    {
+    	return checkTravelBarriers(traveler);
+    }
+ 
     /*  Execute the travel for this actor via this connector */
     execTravel(actor, traveler, conn)
     {

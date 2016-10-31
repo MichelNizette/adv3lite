@@ -672,6 +672,19 @@ Go: TravelAction
 
 ;
     
+/*
+ *   The TransportVia action is never triggered directly by a player command
+ *   but is synthesised whenever the travelVia or checkTravel methods of
+ *   TravelConnector objects are invoked, in order to provide a transitive
+ *   action context in which to execute the travel check and execution phases.
+ */
+DefineTIAction(TransportVia)
+
+    /* Define this so that this action can be called from execNestedAction */
+    resolvedObjectsInScope() { return true; }
+
+;
+
 DefineIAction(GetOut)
     execAction(cmd)
     {        
@@ -1560,8 +1573,10 @@ DefineTAction(PushTravelDir)
                  *   Otherwise, if the travel barriers would not allow the dobj
                  *   to pass or the actor to pass, stop the action here.
                  */
-                if(!conn.checkTravelBarriers(curDobj) 
-                   || !conn.checkTravelBarriers(gActor))
+                // MN-TODO: this should probably be wrapped in the check phase
+                //          of a TransportVia action or something similar. 
+                if(!conn.checkTravel(curDobj) 
+                   || !conn.checkTravel(gActor))
                 {                    
                     return;
                 }
