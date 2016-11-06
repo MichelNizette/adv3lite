@@ -857,23 +857,32 @@ class StringCaptureFilter: CaptureFilter
  */
 class ImplicitActionFilter: OutputFilter
     
+    construct()
+    {
+        /* Note the current action. */
+        action_ = gAction;
+    }
+    
     filterText(ostr, txt)    
     {      
         /* 
          *   This method should never be called if we don't have a current
          *   action, but just in case we return the text unchanged if there is
-         *   no gAction.
+         *   no action.
          */
-        if(gAction == nil)
+        if(action_ == nil)
             return txt;
         
         /* 
          *   If we do have have a gAction, prepend any pending implicit action
          *   announcements to the text we output.
          */
-        return gAction.buildImplicitActionAnnouncement(true, !gAction.isImplicit)
-            + txt;
-    }   
+        return action_.buildImplicitActionAnnouncement(
+            true, !action_.isImplicit) + txt;
+    }
+    
+    /* The current action at the time when this filter is created. */
+    action_ = nil
 ;
 
 

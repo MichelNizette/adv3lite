@@ -1114,13 +1114,16 @@ class IAction: Action
     
     execCycle(cmd)
     {
+        /* 
+         *   Create an output filter to display any pending implicit action
+         *   reports before any other text.
+         */    
+        local filter = new ImplicitActionFilter();
+        
         try
         {
-            /* 
-             *   Add an output filter to display any pending implicit action
-             *   reports before any other text
-             */    
-            gOutStream.addOutputFilter(ImplicitActionFilter);
+            /* Add the filter that displays pending implicit action reports. */
+            gOutStream.addOutputFilter(filter);
             
             /* Carry out the inherited handling. */
             inherited(cmd);
@@ -1132,7 +1135,7 @@ class IAction: Action
              *   Remove the filter that displays pending implicit action
              *   reports.
              */            
-            gOutStream.removeOutputFilter(ImplicitActionFilter);
+            gOutStream.removeOutputFilter(filter);
         }        
     }
     
@@ -1831,6 +1834,7 @@ class TAction: Action
          */        
         if(isImplicit)
             buildImplicitActionAnnouncement(true, nil);
+        local filter = new ImplicitActionFilter();
 
         
         /* 
@@ -1847,7 +1851,7 @@ class TAction: Action
          */            
         try
         {
-            gOutStream.addOutputFilter(ImplicitActionFilter);
+            gOutStream.addOutputFilter(filter);
             
             msg = gOutStream.watchForOutput({: doAction() });
         }
@@ -1855,7 +1859,7 @@ class TAction: Action
         {
             /* Remove any implicit action announcement from the output stream */
 
-            gOutStream.removeOutputFilter(ImplicitActionFilter);
+            gOutStream.removeOutputFilter(filter);
         }
         
         
@@ -2278,7 +2282,8 @@ class TIAction: TAction
          */       
         if(isImplicit)
             buildImplicitActionAnnouncement(true, nil);
-        
+        local filter = new ImplicitActionFilter();
+
         try
         {
             /* 
@@ -2287,7 +2292,7 @@ class TIAction: TAction
              *   pending implicit action reports.
              */
             
-            gOutStream.addOutputFilter(ImplicitActionFilter);
+            gOutStream.addOutputFilter(filter);
             
             /* 
              *   Run the action routine on the current direct object and capture
@@ -2326,7 +2331,7 @@ class TIAction: TAction
         {
             /* Remove any implicit action announcement from the output stream */
                        
-            gOutStream.removeOutputFilter(ImplicitActionFilter);
+            gOutStream.removeOutputFilter(filter);
         }
        
         /* 
