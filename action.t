@@ -1728,12 +1728,12 @@ class TAction: Action
                 announceObject(obj);
             
             /* 
-             *   If we're an implicit action then add a failure message to our
-             *   implicit action list and display the list ("first trying
-             *   to...")
+             *   Display any pending implicit action report before our failure
+             *   message. If we're an implicit action ourselves then a failed
+             *   implicit action report ("first trying to...") will be added to
+             *   the list.
              */
-            if(isImplicit)
-                "<<buildImplicitActionAnnouncement(nil)>>";
+            "<<buildImplicitActionAnnouncement(nil)>>";
             
             /* Display our failure message */
             say(checkMsg);
