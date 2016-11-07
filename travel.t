@@ -747,47 +747,46 @@ class Door: TravelConnector, Thing
         /*  If the Door isn't open, try to open it via an implicit action. */
         if(!isOpen)
         {
-            /* 
-             *   If it's the player character that's trying to move, try opening
-             *   the door via an implicit action.
-             */
-            if(gPlayerChar.isOrIsIn(traveler))
-                tryImplicitAction(Open, self);
-            
-            /*   
-             *   Otherwise get the traveler to try to open the door via an
-             *   implicit action.
-             */
-            else if(tryImplicitActorAction(traveler, Open, self))
-            {      
-            	// MN-TODO: those messages shouldn't be output in the check
-            	//          phase. 
-                         
-                /* 
-                 *   If the player character can see the traveler open the door,
-                 *   report the fact that the traveler does so.
-                 */
-                if(gPlayerChar.canSee(traveler))
-                    sayTravelerOpensDoor(traveler);
-                
-                else if(otherSide && gPlayerChar.canSee(otherSide))                
-                    sayDoorOpens();                                
-                
-            }
+            /* Try opening the door via an implicit action. */
+            local openAllowed = tryImplicitAction(Open, self);
             
             /* 
-             *   If we're not allowed to open this door via an implicit action
-             *   (because opening it is marked as dangerous or nonObvious at the
-             *   verify stage) display a message explaining why the travel can't
-             *   be carried out, provided the player char can see the traveler.
+             *   If it's the player character that's trying to open the door,
+             *   the result will be displayed at the end of the check phase as
+             *   an implicit action report.  Otherwise, we display now a report
+             *   of the attempt to open the door.
              */
-            
-            else if(gPlayerChar.canSee(traveler))            
+            // MN-TODO: those messages shouldn't be output in the check phase. 
+            if (!gActor.isPlayerChar)
             {
-                local obj = self;
-                gMessageParams(obj);                
+                if (openAllowed && isOpen)
+                {
+                    /* 
+                     *   If the player character can see the actor open
+                     *   the door, report the fact that the actor does so.
+                     */
+                    if(gPlayerChar.canSee(traveler))
+                        sayTravelerOpensDoor(traveler);
+                    
+                    else if(otherSide && gPlayerChar.canSee(otherSide))                
+                        sayDoorOpens();                                
+                }
                 
-                say(cannotGoThroughClosedDoorMsg);
+                /* 
+                 *   If we're not allowed to open this door via an implicit
+                 *   action (because opening it is marked as dangerous or
+                 *   nonObvious at the verify stage) display a message
+                 *   explaining why the travel can't be carried out, provided
+                 *   the player char can see the traveler.
+                 */
+                
+                else if(!openAllowed && gPlayerChar.canSee(gActor))            
+                {
+                    local obj = self;
+                    gMessageParams(obj);                
+                    
+                    say(cannotGoThroughClosedDoorMsg);
+                }
             }
         }
         
