@@ -932,7 +932,8 @@ class Door: TravelConnector, Thing
     /*  Going through a door is the same as traveling via it. */
     dobjFor(GoThrough)
     {
-        action() { travelVia(gActor); }
+        check() { checkTravel(gActor); }
+        action() { actionTravel(gActor); }
     }
     
     /*  Entering a door is the same as going through it. */
@@ -1065,37 +1066,11 @@ class TravelConnector: object
         nestedAction(TransportVia, actor, self);           
     }
     
+    /* Check and carry out travel with gDobj as the object doing the travel. */
     iobjFor(TransportVia)
     {
-    	check()
-    	{
-	        /* 
-	         *   The traveler is the object actually doing the travelling;
-	         *   usually it's just the direct object, but if the direct object
-	         *   is in a vehicle, it will be the vehicle.
-	         */
-	        local traveler = getTraveler(gDobj);       
-	        
-	        /* 
-	         *   Check the travel barriers on this TravelConnector to ensure
-	         *   that travel is permitted. If not, checkTravel will report the
-	         *   reason why travel is blocked.
-	         */
-	        checkTravel(traveler);
-    	}
-    	
-    	action()
-    	{
-	        /* 
-	         *   The traveler is the object actually doing the travelling;
-	         *   usually it's just the direct object, but if the direct object
-	         *   is in a vehicle, it will be the vehicle.
-	         */
-	        local traveler = getTraveler(gDobj);       
-	        
-	        /* Carry out the travel. */
-	        execTravel(gDobj, traveler, self);
-    	}
+    	check() { checkTravel(gDobj); }
+    	action() { actionTravel(gDobj); }
     }
     
    
@@ -1123,13 +1098,39 @@ class TravelConnector: object
     }
     
     /*
-     *   Check that travel is possible for this actor via this connector,
+     *   Check that travel is possible for this object via this connector,
      *   and attempt to carry out any implicit actions necessary to make travel
      *   possible.
      */
-    checkTravel(traveler)
+    checkTravel(obj)
     {
+        /* 
+         *   The traveler is the object actually doing the travelling;
+         *   usually it's just the obj parameter, but if the obj parameter is in
+         *   a vehicle, it will be the vehicle.
+         */
+        local traveler = getTraveler(obj);       
+
+        /* 
+         *   Check the travel barriers on this TravelConnector to ensure that
+         *   travel is permitted. If not, checkTravelBarriers will report the
+         *   reason why travel is blocked.
+         */
     	return checkTravelBarriers(traveler);
+    }
+ 
+    /*  Execute the travel for this object */
+    actionTravel(obj)
+    {
+        /* 
+         *   The traveler is the object actually doing the travelling;
+         *   usually it's just the obj parameter, but if the obj parameter is in
+         *   a vehicle, it will be the vehicle.
+         */
+        local traveler = getTraveler(obj);       
+
+        /*  Execute the travel for this object via this connector */
+        execTravel(obj, traveler, self);
     }
  
     /*  Execute the travel for this actor via this connector */

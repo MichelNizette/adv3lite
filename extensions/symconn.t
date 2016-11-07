@@ -209,7 +209,8 @@ class SymPassage: MultiLoc, SymConnector, Thing
      /*  Going through a passage is the same as traveling via it. */
     dobjFor(GoThrough)
     {
-        action() { travelVia(gActor); }
+        check() { checkTravel(gActor); }
+        action() { actionTravel(gActor); }
     }
     
     /*  Entering a passage is the same as going through it. */
