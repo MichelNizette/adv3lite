@@ -1570,13 +1570,20 @@ DefineTAction(PushTravelDir)
                     replaceAction(conn.PushTravelVia, gDobj, conn);
                                
                 /* 
-                 *   Otherwise, if the travel barriers would not allow the dobj
-                 *   to pass or the actor to pass, stop the action here.
+                 *   Check if the travel barriers would allow the dobj
+                 *   to pass or the actor to pass, and announce any implicit
+                 *   actions triggered by attempting to negociate the travel
+                 *   barriers.
                  */
-                // MN-TODO: this should probably be wrapped in the check phase
-                //          of a TransportVia action or something similar. 
-                if(!conn.checkTravel(curDobj) 
-                   || !conn.checkTravel(gActor))
+                local checkPasses
+                    = conn.checkTravel(curDobj) && conn.checkTravel(gActor);
+                "<<buildImplicitActionAnnouncement(checkPasses)>>";
+
+                /* 
+                 *   If the travel barriers do not allow the dobj to pass or
+                 *   the actor to pass, stop the action here.
+                 */
+                if (!checkPasses)
                 {                    
                     return;
                 }
